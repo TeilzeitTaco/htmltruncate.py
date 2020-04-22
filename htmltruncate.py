@@ -125,39 +125,55 @@ class Tokenizer:
         self.counter += 1
         return CloseTag( ''.join(tag) )
 
-def truncate(str, target_len, ellipsis = ''):
+def truncate(str, target_len, max_newlines = -1, ellipsis = ''):
     """Returns a copy of str truncated to target_len characters,
     preserving HTML markup (which does not count towards the length).
     Any tags that would be left open by truncation will be closed at
-    the end of the returned string.  Optionally append ellipsis if
+    the end of the returned string. Optionally append ellipsis if
     the string was truncated."""
-    stack = []   # open tags are pushed on here, then popped when the matching close tag is found
-    retval = []  # string to be returned
-    length = 0   # number of characters (not counting markup) placed in retval so far
-    tokens = Tokenizer(str)
-    tok = tokens.next_token()
+
+    stack    = []  # open tags are pushed on here, then popped when the matching close tag is found
+    retval   = []  # string to be returned
+    length   = 0   # number of characters (not counting markup) placed in retval so far
+    newlines = 0
+    tokens   = Tokenizer(str)
+    tok      = tokens.next_token()
+
     while tok != END:
         if not length < target_len:
             retval.append(ellipsis)
             break
+
         if tok.__class__.__name__ == 'OpenTag':
             stack.append(tok)
-            retval.append( tok.as_string() )
+            retval.append(tok.as_string())
+
         elif tok.__class__.__name__ == 'CloseTag':
             if stack[-1].tag == tok.tag:
                 stack.pop()
-                retval.append( tok.as_string() )
+                retval.append(tok.as_string())
             else:
-                raise UnbalancedError( tok.as_string() )
+                raise UnbalancedError(tok.as_string())
+
         elif tok.__class__.__name__ == 'SelfClosingTag':
-            retval.append( tok.as_string() )
+            if tok.as_string() == "<br />":
+                newlines += 1
+                if newlines == max_newlines:
+                    retval.append(ellipsis)
+                    break
+
+            retval.append(tok.as_string())
+
         else:
             retval.append(tok)
             length += 1
+
         tok = tokens.next_token()
+
     while len(stack) > 0:
-        tok = CloseTag( stack.pop().tag )
-        retval.append( tok.as_string() )
+        tok = CloseTag(stack.pop().tag)
+        retval.append(tok.as_string())
+
     return ''.join(retval)
 
 if __name__ == "__main__":
