@@ -104,13 +104,13 @@ class Tokenizer:
             char = self.__next_char()
         if self.input[self.counter - 1] == '/':
             self.counter += 1
-            return SelfClosingTag( ''.join(tag), ''.join(rest) )
+            return SelfClosingTag(''.join(tag), ''.join(rest))
         elif ''.join(tag) in VOID_ELEMENTS:
             self.counter += 1
-            return SelfClosingTag( ''.join(tag), ''.join(rest) )
+            return SelfClosingTag(''.join(tag), ''.join(rest))
         else:
             self.counter += 1
-            return OpenTag( ''.join(tag), ''.join(rest) )
+            return OpenTag(''.join(tag), ''.join(rest))
 
     def __close_tag(self):
         """Return an open/close tag token.
@@ -176,9 +176,9 @@ def truncate(str, target_len, max_newlines = -1, ellipsis = ''):
 
     return ''.join(retval)
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     try:
         while True:
-            print(truncate(raw_input("> "), int(sys.argv[1])))
+            print(truncate(raw_input('> '), int(sys.argv[1])))
     except EOFError:
         sys.exit(0)
