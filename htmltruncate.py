@@ -132,9 +132,9 @@ def truncate(str, target_len, max_newlines = -1, ellipsis = ''):
     the end of the returned string. Optionally append ellipsis if
     the string was truncated."""
 
-    stack    = []  # open tags are pushed on here, then popped when the matching close tag is found
-    retval   = []  # string to be returned
-    length   = 0   # number of characters (not counting markup) placed in retval so far
+    stack    = [] # open tags are pushed on here, then popped when the matching close tag is found
+    retval   = [] # string to be returned
+    length   = 0  # number of characters (not counting markup) placed in retval so far
     newlines = 0
     tokens   = Tokenizer(str)
     tok      = tokens.next_token()
@@ -156,7 +156,8 @@ def truncate(str, target_len, max_newlines = -1, ellipsis = ''):
                 raise UnbalancedError(tok.as_string())
 
         elif tok.__class__.__name__ == 'SelfClosingTag':
-            if tok.as_string() == "<br />":
+            # Catch line breaks
+            if tok.as_string() == "<br>" or "<br />":
                 newlines += 1
                 if newlines == max_newlines:
                     retval.append(ellipsis)
@@ -165,6 +166,13 @@ def truncate(str, target_len, max_newlines = -1, ellipsis = ''):
             retval.append(tok.as_string())
 
         else:
+            # This only occurs in <pre> block I think
+            if tok == "\n":
+                newlines += 1
+                if newlines == max_newlines:
+                    retval.append(ellipsis)
+                    break
+
             retval.append(tok)
             length += 1
 
