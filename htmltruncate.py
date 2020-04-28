@@ -156,8 +156,8 @@ def truncate(str, target_len, max_newlines = -1, ellipsis = ''):
                 raise UnbalancedError(tok.as_string())
 
         elif tok.__class__.__name__ == 'SelfClosingTag':
-            # Catch line breaks
-            if tok.as_string() == "<br>" or "<br />":
+            # Catch HTML line breaks
+            if (tok.as_string() == "<br>") or (tok.as_string() == "<br />"):
                 newlines += 1
                 if newlines == max_newlines:
                     retval.append(ellipsis)
