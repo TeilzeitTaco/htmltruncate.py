@@ -169,7 +169,7 @@ def truncate(str, target_len, max_newlines = -1, ellipsis = ''):
             # This only occurs in <pre> block I think
             if tok == "\n":
                 newlines += 1
-                if newlines == max_newlines:
+                if newlines == (max_newlines - 1):
                     retval.append(ellipsis)
                     break
 
